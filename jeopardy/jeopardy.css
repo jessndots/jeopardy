@@ -31,7 +31,7 @@ table {
   border-collapse: collapse;
   table-layout: fixed ;
   width: 90% ;
-  
+  visibility: visible;
 }
 
 td, th {
@@ -43,6 +43,16 @@ td, th {
   color: lightgoldenrodyellow; 
   vertical-align: middle;
   font-family: 'PT Serif', serif;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+td:hover {
+  cursor: pointer;
 }
 
 th {
@@ -55,7 +65,7 @@ td {
   font-weight: 300;
 }
 
-a.button6 {
+#newGame {
   display:inline-block;
   padding:0.7em 1.4em;
   margin-left: 5%;
@@ -71,7 +81,10 @@ a.button6 {
   text-align:center;
   position:relative;
   }
-a.button6:active{
+#newGame:hover {
+  cursor: pointer;
+}
+#newGame:active{
   top:0.1em;
   }
 @media all and (max-width:30em){
@@ -80,3 +93,34 @@ a.button6:active{
     margin:0.4em auto;
   }
 }
+
+@keyframes loading {
+  0% {font-size: 30px;}
+  50% {font-size: 24px;}
+  100% {font-size: 30px;}
+}
+
+#loading-div {
+  display: flex;
+  justify-content: center;
+  visibility: visible;
+  width: 90%;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  height: 20em;
+
+}
+
+p {
+  font-family: 'Teko', sans-serif;
+  text-align: center;
+  color: black;
+  -webkit-text-fill-color: rgb(252, 209, 99); /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #74119c ;
+  text-shadow: white;
+  animation: loading 2s infinite;
+}
+
+
