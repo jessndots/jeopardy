@@ -30,12 +30,16 @@ async function getCategoryIds() {
     while (catIds.size < numCats) {
         try {
             let response = await axios.get('https://jservice.io/api/category', { params: { id: Math.floor(Math.random() * 20000) } });
-            if (response.data.title) {
+            let questions = new Set()
+            for (let i = 0; i < response.data.clues.length; i++) {
+                questions.add(response.data.clues[i].question)
+            }
+            if (questions.size > 4) {
                 catIds.add(response.data.id);
             }
         }
         catch (err) {
-            continue;
+
         }
     }
     catIds = [...catIds]
@@ -93,14 +97,15 @@ async function fillTable() {
         $('#row3').append(`<td id='${i + 1}-3' data-catId='${catIds[i]}' data-column='${i + 1}' data-row='3'>?</td>`)
         $('#row4').append(`<td id='${i + 1}-4' data-catId='${catIds[i]}' data-column='${i + 1}' data-row='4'>?</td>`)
         $('#row5').append(`<td id='${i + 1}-5' data-catId='${catIds[i]}' data-column='${i + 1}' data-row='5'>?</td>`)
-
         let selectedClues = [];
-        let randInts = new Set();
-        while (selectedClues.length < 5) {
-            let randInt = Math.floor(Math.random() * catData.clues.length)
-            if (!(selectedClues.includes(randInt))) {
-                selectedClues.push(catData.clues[randInt])
-                randInts.add(randInt)
+        let questions = new Set();
+        if (catData.clues.length < 5) { console.log('error - not enough clues') } else {
+            while (selectedClues.length < 5) {
+                let clue = catData.clues[Math.floor(Math.random() * catData.clues.length)];
+                if (!(questions.has(clue.question))) {
+                    selectedClues.push(clue)
+                    questions.add(clue.question)
+                }
             }
         }
         clues.push(selectedClues)
@@ -134,12 +139,15 @@ async function handleClick(target) {
  */
 
 function showLoadingView() {
-
+    $('table').css('visibility', 'collapse');
+    $('#loading-div').css('visibility', 'visible');
 }
 
 /** Remove the loading spinner and update the button used to fetch data. */
 
 function hideLoadingView() {
+    $('#loading-div').css('visibility', 'hidden');
+    $('table').css('visibility', 'visible');
 }
 
 /** Start game:
@@ -150,28 +158,36 @@ function hideLoadingView() {
  * */
 
 async function setupAndStart() {
-    $('th').remove();
-    $('td').remove();
+    $('#content').remove();
+    $('body').prepend('<div id="content"></div>')    
+    $('#content').append('<h1 id="title">JEOPARDY!</h1>');
+    $('#content').append('<a id="newGame">New Game</a>');
+    $('#content').append('<br></br>')
+    $('#content').append('<table id="jeopardy-table"><thead><tr id="cat-row"></tr></thead><tbody><tr id="row1"></tr><tr id="row2"></tr><tr id="row3"></tr><tr id="row4"></tr><tr id="row5"></tr></tbody></table>')
+    $('#content').append('<div id="loading-div"><p>LOADING...</p></div>')
 
+    showLoadingView() //change back to showLoadingView()
     catIds = new Set();
     clues = [];
     await getCategoryIds();
     await fillTable();
-
+    hideLoadingView()
 }
 
 /** On click of start / restart button, set up game. */
-$('.button6').click(async function () {
+$('body').on('click', '#newGame', async function () {
     await setupAndStart()
 })
-// TODO
 
 /** On page load, add event handler for clicking clues */
 $(document).ready(async function () {
     await setupAndStart()
-    $('table').on('click', 'td', function (evt) {
+    $('body').on('click', 'td', function (evt) {
         handleClick(evt.target)
     })
+    
 })
+
+
 
 
